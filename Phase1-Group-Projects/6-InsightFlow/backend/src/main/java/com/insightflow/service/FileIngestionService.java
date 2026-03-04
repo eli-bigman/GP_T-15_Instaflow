@@ -1,40 +1,40 @@
 package com.insightflow.service;
 
-import com.insightflow.dto.FileUploadResponse;
-import com.insightflow.model.DataSource;
-import com.insightflow.model.IngestionJob;
-import com.insightflow.model.enums.JobStatus;
-import com.insightflow.model.enums.SourceType;
-import com.insightflow.repository.DataSourceRepository;
-import com.insightflow.repository.IngestionJobRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.time.LocalDateTime;
-import java.util.*;
+//import com.insightflow.dto.FileUploadResponse;
+//import com.insightflow.model.DataSource;
+//import com.insightflow.model.IngestionJob;
+//import com.insightflow.model.enums.JobStatus;
+//import com.insightflow.model.enums.SourceType;
+//import com.insightflow.repository.DataSourceRepository;
+//import com.insightflow.repository.IngestionJobRepository;
+//import lombok.RequiredArgsConstructor;
+//import lombok.extern.slf4j.Slf4j;
+//import org.springframework.beans.factory.annotation.Value;
+//import org.springframework.stereotype.Service;
+//import org.springframework.web.multipart.MultipartFile;
+//
+//import java.io.*;
+//import java.nio.charset.StandardCharsets;
+//import java.nio.file.*;
+//import java.time.LocalDateTime;
+//import java.util.*;
 
 /**
  * Service responsible for ingesting CSV file uploads.
  * Owner: Dev A
  */
-@Service
-@RequiredArgsConstructor
-@Slf4j
+//@Service
+//@RequiredArgsConstructor
+//@Slf4j
 public class FileIngestionService {
-    private final DataSourceRepository dataSourceRepository;
+    /*private final DataSourceRepository dataSourceRepository;
     private final IngestionJobRepository ingestionJobRepository;
-    private final ValidationService validationService;
+    private final ValidationService validationService;*/
 
-    @Value("${app.upload.directory:./uploads}")
-    private String uploadDirectory;
+//    @Value("${app.upload.directory:./uploads}")
+//    private String uploadDirectory;
 
-    public FileUploadResponse uploadAndParseCsv(MultipartFile file) throws IOException {
+    /*public FileUploadResponse uploadAndParseCsv(MultipartFile file) throws IOException {
         String fileName = file.getOriginalFilename();
         log.info("Processing CSV upload: {}", fileName);
 
@@ -103,5 +103,5 @@ public class FileIngestionService {
     }
 
     public List<IngestionJob> getJobs() { return ingestionJobRepository.findAll(); }
-    public Optional<IngestionJob> getJobById(Long id) { return ingestionJobRepository.findById(id); }
+    public Optional<IngestionJob> getJobById(Long id) { return ingestionJobRepository.findById(id); }*/
 }
