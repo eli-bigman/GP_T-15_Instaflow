@@ -9,8 +9,10 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    @Value("${jwt.secret}") private String secret;
-    @Value("${jwt.expiration}") private long expiration;
+    @Value("${app.jwt.secret:Y2hhbmdlLXRoaXMtaW4tcHJvZHVjdGlvbi1pbnNpZ2h0Zmxvdy1zZWNyZXQta2V5LTEyMzQ1Njc4OQ==}")
+    private String secret;
+    @Value("${app.jwt.expiration-ms:86400000}")
+    private long expiration;
 
     private Key getSigningKey() { return Keys.hmacShaKeyFor(secret.getBytes()); }
 
