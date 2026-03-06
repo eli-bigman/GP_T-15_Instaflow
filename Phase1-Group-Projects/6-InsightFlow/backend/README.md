@@ -44,9 +44,10 @@ Copy the example env file and fill in the values:
 
 ```bash
 cp .env.example .env
+cp .env.docker.example .env
 ```
 
-Open `.env` and fill in your values:
+Open `.env` and `.env.docker` and fill in your values:
 
 ```properties
 # Database
@@ -62,7 +63,7 @@ APP_REFRESH_TOKEN_EXPIRATION=604800000 # Will only be use when we decide to add 
 # Google OAuth
 # Will only be use when we decide to add OAuth
 APP_GOOGLE_CLIENT_ID=your_google_client_id
-APP_GOOGLE_CLIENT_SECRET=your_google_client_secret
+APP_GOOGLE_CLIENT_SECRET=your_google_client_secre++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++t
 APP_REDIRECT_URL=http://localhost:3000/login
 ```
 
