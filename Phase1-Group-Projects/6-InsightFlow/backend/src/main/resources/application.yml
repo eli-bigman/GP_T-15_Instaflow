@@ -12,7 +12,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-    defer-datasource-initialization: true
   servlet:
     multipart:
       max-file-size: 10MB
