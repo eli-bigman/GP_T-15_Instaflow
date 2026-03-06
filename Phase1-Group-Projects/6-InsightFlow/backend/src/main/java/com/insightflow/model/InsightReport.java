@@ -14,5 +14,12 @@ public class InsightReport {
     @Column(columnDefinition = "TEXT") private String dataJson;
     @ManyToOne @JoinColumn(name = "pipeline_id") private Pipeline pipeline;
     @ManyToOne @JoinColumn(name = "created_by") private User createdBy;
-    @Column(name = "created_at") private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

@@ -1,5 +1,8 @@
 package com.insightflow.service;
 
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 import com.insightflow.dto.FileUploadResponse;
 import com.insightflow.model.DataSource;
 import com.insightflow.model.IngestionJob;
@@ -13,11 +16,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
 import java.time.LocalDateTime;
-import java.util.*;
 
 /**
  * Service responsible for ingesting CSV file uploads.
@@ -70,8 +70,9 @@ public class FileIngestionService {
                     row.put(headers.get(i).trim(), value);
                 }
                 List<String> requiredFields = List.of("transaction_id", "product_id", "quantity");
+                int finalRowNum = rowNum;
                 List<String> rowErrors = validationService.validateRow(row, requiredFields)
-                        .stream().map(vr -> "Row " + rowNum + ": " + vr.getErrorMessage()).toList();
+                        .stream().map(vr -> "Row " + finalRowNum + ": " + vr.getErrorMessage()).toList();
                 if (!rowErrors.isEmpty()) { failedRows++; validationErrors.addAll(rowErrors); }
                 rows.add(row);
             }

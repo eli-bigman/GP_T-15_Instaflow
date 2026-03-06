@@ -1,8 +1,8 @@
 package com.insightflow.dto;
 
+import lombok.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.*;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class AuthRequest {
