@@ -40,3 +40,35 @@ jobs:
           APP_JWT_SECRET: ${{secrets.APP_JWT_SECRET}}
           APP_ACCESS_TOKEN_EXPIRATION: ${{secrets.APP_ACCESS_TOKEN_EXPIRATION}}
           APP_REFRESH_TOKEN_EXPIRATION: ${{secrets.APP_REFRESH_TOKEN_EXPIRATION}}
+
+  frontend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./Phase1-Group-Projects/6-InsightFlow/frontend
+
+    env:
+      BACKEND_URL: http://localhost:8080
+      COOKIE_NAME: ${{secrets.FRONTEND_COOKIE_NAME}}
+      COOKIE_KEY: ${{ secrets.FRONTEND_COOKIE_KEY }}
+      COOKIE_EXPIRY_DAYS: ${{ secrets.FRONTEND_COOKIE_EXPIRY_DAYS }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check for syntax errors
+        run: python -m py_compile app.py pages/*.py utils/*.py components/*.py
+
+      - name: Run linter
+        run: |
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv,.venv,__pycache__,.git
