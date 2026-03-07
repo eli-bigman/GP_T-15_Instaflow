@@ -1,5 +1,7 @@
 # InsightFlow - Multi-Source Business Intelligence Pipeline
 
+![CI/CD](https://github.com/eli-bigman/GP_T-15_Instaflow/actions/workflows/ci.yml/badge.svg)
+
 ## Overview
 
 InsightFlow is a multi-source BI pipeline for retail companies.
@@ -33,37 +35,72 @@ POS(CSV) + OnlineStore(API) + InternalDB(JDBC)
 ## Role Split
 
 ### Java Backend Developers (2-3)
-| Developer | Responsibility | Key Files |
-|-----------|---------------|-----------|
-| **Dev A** | File ingestion, CSV parsing, validation | FileIngestionService, ValidationService, FileUploadController |
-| **Dev B** | API feed connectors, data standardization | ApiFeedService, StandardizationService, OrderFeedController |
-| **Dev C** | Pipeline orchestration, auth, metrics API | AuthService, PipelineService, MetricsService, controllers |
+
+| Developer | Responsibility                            | Key Files                                                     |
+| --------- | ----------------------------------------- | ------------------------------------------------------------- |
+| **Dev A** | File ingestion, CSV parsing, validation   | FileIngestionService, ValidationService, FileUploadController |
+| **Dev B** | API feed connectors, data standardization | ApiFeedService, StandardizationService, OrderFeedController   |
+| **Dev C** | Pipeline orchestration, auth, metrics API | AuthService, PipelineService, MetricsService, controllers     |
 
 ### Data Engineers (2-3)
-| Engineer | Responsibility | Key Files |
-|----------|---------------|-----------|
-| **DE 1** | Warehouse schema, ETL pipeline core | schema.sql, etl_pipeline.py, create_warehouse.py |
-| **DE 2** | Data transformations, quality checks | transformations.py, quality_checks.py, quality_scoring.py |
-| **DE 3** | Business metrics, reporting dashboard | business_metrics.py, reporting_dashboard.py |
+
+| Engineer | Responsibility                        | Key Files                                                 |
+| -------- | ------------------------------------- | --------------------------------------------------------- |
+| **DE 1** | Warehouse schema, ETL pipeline core   | schema.sql, etl_pipeline.py, create_warehouse.py          |
+| **DE 2** | Data transformations, quality checks  | transformations.py, quality_checks.py, quality_scoring.py |
+| **DE 3** | Business metrics, reporting dashboard | business_metrics.py, reporting_dashboard.py               |
 
 ## Quick Start
 
 ### Prerequisites
+
 - Docker & Docker Compose
 - Java 21+ / Maven 3.9+
 - Python 3.10+
 
-### 1. Start Infrastructure
+## Docker Deployment
+
+### Using Pre-built Images (from Docker Hub)
+
 ```bash
-docker-compose up -d
+docker compose up -d
+```
+
+This pulls and runs pre-built images from Docker Hub.
+
+### Building Locally (for development)
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+```
+
+This builds images locally from Dockerfiles.
+
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```properties
+APP_DB_USER=insightflow
+APP_DB_PASSWORD=insightflow_pass
+APP_JWT_SECRET=your_jwt_secret_here
+APP_ACCESS_TOKEN_EXPIRATION=86400000
+APP_REFRESH_TOKEN_EXPIRATION=604800000
+BACKEND_URL=http://backend:8080
+FRONTEND_COOKIE_NAME=insightflow_auth_cookie
+FRONTEND_COOKIE_KEY=your_cookie_key_here
+FRONTEND_COOKIE_EXPIRY_DAYS=30
+DOCKER_USERNAME=your_dockerhub_username
 ```
 
 ### 2. Run Backend
+
 ```bash
 cd backend && mvn spring-boot:run
 ```
 
 ### 3. Set Up Data Engineering
+
 ```bash
 cd data-engineering
 pip install -r requirements.txt
@@ -72,29 +109,31 @@ python sample_data/generate_data.py
 ```
 
 ### 4. Run Dashboard
+
 ```bash
 streamlit run data-engineering/dashboards/reporting_dashboard.py
 ```
 
 ## API Endpoints
 
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|--------|
-| POST | /api/auth/register | Register new user | Implemented |
-| POST | /api/auth/login | Login and get JWT | Implemented |
-| POST | /api/ingest/csv | Upload CSV file | Implemented |
-| POST | /api/ingest/json | Upload JSON data | Stub |
-| GET | /api/ingest/jobs | List ingestion jobs | Implemented |
-| GET | /api/ingest/jobs/{id} | Get job details | Implemented |
-| POST | /api/feed/orders | Receive order feed | Stub |
-| POST | /api/feed/inventory | Receive inventory updates | Stub |
-| POST | /api/pipeline/trigger | Trigger ETL pipeline | Stub |
-| GET | /api/pipeline/status | Get pipeline status | Stub |
-| GET | /api/pipeline/history | Get run history | Stub |
-| GET | /api/metrics/revenue?days=30 | Daily revenue data | Stub |
-| GET | /api/metrics/top-products?limit=10 | Top selling products | Stub |
-| GET | /api/metrics/satisfaction | Customer satisfaction | Stub |
-| GET | /api/metrics/inventory | Inventory turnover | Stub |
+| Method | Endpoint                           | Description               | Status      |
+| ------ | ---------------------------------- | ------------------------- | ----------- |
+| POST   | /api/auth/register                 | Register new user         | Implemented |
+| POST   | /api/auth/login                    | Login and get JWT         | Implemented |
+| POST   | /api/ingest/csv                    | Upload CSV file           | Implemented |
+| POST   | /api/ingest/json                   | Upload JSON data          | Stub        |
+| GET    | /api/ingest/jobs                   | List ingestion jobs       | Implemented |
+| GET    | /api/ingest/jobs/{id}              | Get job details           | Implemented |
+| POST   | /api/feed/orders                   | Receive order feed        | Stub        |
+| POST   | /api/feed/inventory                | Receive inventory updates | Stub        |
+| POST   | /api/pipeline/trigger              | Trigger ETL pipeline      | Stub        |
+| GET    | /api/pipeline/status               | Get pipeline status       | Stub        |
+| GET    | /api/pipeline/history              | Get run history           | Stub        |
+| GET    | /api/metrics/revenue?days=30       | Daily revenue data        | Stub        |
+| GET    | /api/metrics/top-products?limit=10 | Top selling products      | Stub        |
+| GET    | /api/metrics/satisfaction          | Customer satisfaction     | Stub        |
+| GET    | /api/metrics/inventory             | Inventory turnover        | Stub        |
 
 ### Swagger UI
+
 Available at: http://localhost:8080/swagger-ui.html

@@ -1,0 +1,53 @@
+services:
+  db:
+    image: gdakore/insightflow-db:latest
+    container_name: insightflow-db
+    environment:
+      POSTGRES_USER: ${APP_DB_USER}
+      POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
+      POSTGRES_DB: insightflow_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${APP_DB_USER} -d insightflow_app"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: insightflow-backend
+    ports:
+      - "8080:8080"
+    environment:
+      APP_DB_URL: jdbc:postgresql://db:5432/insightflow_app
+      APP_DB_USER: ${APP_DB_USER}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+      APP_JWT_SECRET: ${APP_JWT_SECRET}
+      APP_ACCESS_TOKEN_EXPIRATION: ${APP_ACCESS_TOKEN_EXPIRATION}
+      APP_REFRESH_TOKEN_EXPIRATION: ${APP_REFRESH_TOKEN_EXPIRATION}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: insightflow-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
+      COOKIE_NAME: ${FRONTEND_COOKIE_NAME}
+      COOKIE_KEY: ${FRONTEND_COOKIE_KEY}
+      COOKIE_EXPIRY_DAYS: ${FRONTEND_COOKIE_EXPIRY_DAYS}
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
