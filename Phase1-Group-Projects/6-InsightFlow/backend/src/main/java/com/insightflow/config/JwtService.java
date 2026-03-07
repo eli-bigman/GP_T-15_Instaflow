@@ -19,10 +19,11 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String email, String role) {
+    public String generateToken(Long userId, String email, String role) {
         return Jwts.builder()
                 .subject(email)
                 .claim("role", role)
+                .claim("userId", userId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -30,23 +31,31 @@ public class JwtService {
     }
 
     public String extractEmail(String token) {
-        return Jwts.parser()
-                .verifyWith((javax.crypto.SecretKey) getSigningKey()) // ✅ new API
-                .build()
-                .parseSignedClaims(token) // ✅ replaces parseClaimsJws()
-                .getPayload()
-                .getSubject();
+        return getClaims(token).getSubject();
+    }
+
+    public String extractRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    public Long extractUserId(String token) {
+        return getClaims(token).get("userId", Long.class);
     }
 
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parser()
-                    .verifyWith((javax.crypto.SecretKey) getSigningKey()) // ✅ new API
-                    .build()
-                    .parseSignedClaims(token); // ✅ replaces parseClaimsJws()
+            getClaims(token);
             return true;
         } catch (JwtException e) {
             return false;
         }
+    }
+
+    private io.jsonwebtoken.Claims getClaims(String token) {
+        return Jwts.parser()
+                .verifyWith((javax.crypto.SecretKey) getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
