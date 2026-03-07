@@ -7,7 +7,11 @@ Endpoints used:
   POST /api/auth/login     – AuthRequest  { email, password }
   POST /api/auth/register  – RegisterRequest { name, email, password }
 
-Both return AuthResponse { token, email, name, role }.
+Both return ApiResponse<AuthResponse>:
+  { status, message, data: { token, email, name, role } }
+
+The login() and register() functions unwrap and return the inner
+AuthResponse dict so callers don't need to know about the wrapper.
 """
 
 import os
@@ -24,7 +28,7 @@ def login(email: str, password: str) -> dict:
     """
     Authenticate against the Spring Boot backend.
 
-    Returns the AuthResponse dict on success.
+    Returns the inner AuthResponse dict { token, email, name, role } on success.
     Raises ValueError (bad credentials / server error) or
            ConnectionError (backend not reachable).
     """
@@ -41,9 +45,9 @@ def login(email: str, password: str) -> dict:
         )
 
     if resp.status_code == 200:
-        return resp.json()
+        return resp.json()["data"]  # unwrap ApiResponse → AuthResponse
 
-    # Surface the error message from the backend
+    # Surface the error message from the ApiResponse wrapper
     try:
         msg = resp.json()
         detail = msg if isinstance(msg, str) else (msg.get("message") or msg.get("error") or str(msg))
@@ -56,7 +60,7 @@ def register(name: str, email: str, password: str) -> dict:
     """
     Register a new user via the Spring Boot backend.
 
-    Returns the AuthResponse dict (includes JWT) on success.
+    Returns the inner AuthResponse dict { token, email, name, role } on success.
     Raises ValueError or ConnectionError on failure.
     """
     try:
@@ -72,7 +76,7 @@ def register(name: str, email: str, password: str) -> dict:
         )
 
     if resp.status_code == 200:
-        return resp.json()
+        return resp.json()["data"]  # unwrap ApiResponse → AuthResponse
 
     try:
         msg = resp.json()

@@ -1,6 +1,6 @@
 package com.insightflow.config;
 
-import com.insightflow.repository.UserRepository;
+import com.insightflow.model.UserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +17,6 @@ import java.util.List;
 @Component @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
-    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -28,12 +27,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
         String token = authHeader.substring(7);
         if (jwtService.isTokenValid(token)) {
-            String email = jwtService.extractEmail(token);
-            userRepository.findByEmail(email).ifPresent(user -> {
-                var auth = new UsernamePasswordAuthenticationToken(user, null,
-                        List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())));
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            });
+            String email  = jwtService.extractEmail(token);
+            String role   = jwtService.extractRole(token);
+            Long   userId = jwtService.extractUserId(token);
+            var principal = new UserPrincipal(userId, email, role);
+            var auth = new UsernamePasswordAuthenticationToken(
+                    principal, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
         filterChain.doFilter(request, response);
     }

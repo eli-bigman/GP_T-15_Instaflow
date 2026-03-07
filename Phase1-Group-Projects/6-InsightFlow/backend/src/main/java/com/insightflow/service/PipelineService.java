@@ -1,6 +1,7 @@
 package com.insightflow.service;
 
 import com.insightflow.dto.*;
+import com.insightflow.exception.AppException;
 import com.insightflow.model.*;
 import com.insightflow.model.enums.PipelineStatus;
 import com.insightflow.repository.*;
@@ -13,20 +14,21 @@ import java.util.List;
 public class PipelineService {
     private final PipelineRepository pipelineRepository;
     private final DataSourceRepository dataSourceRepository;
+    private final UserRepository userRepository;
 
     public List<PipelineResponse> getAll() {
         return pipelineRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(this::toResponse).toList();
     }
 
-    public PipelineResponse create(PipelineRequest request, User user) {
+    public PipelineResponse create(PipelineRequest request, UserPrincipal principal) {
         DataSource ds = dataSourceRepository.findById(request.getDataSourceId())
-                .orElseThrow(() -> new RuntimeException("Data source not found"));
+                .orElseThrow(() -> AppException.notFound("Data source not found"));
         Pipeline pipeline = Pipeline.builder()
                 .name(request.getName())
                 .description(request.getDescription())
                 .dataSource(ds)
-                .createdBy(user)
+                .createdBy(userRepository.getReferenceById(principal.id()))
                 .status(PipelineStatus.PENDING)
                 .build();
         return toResponse(pipelineRepository.save(pipeline));
@@ -34,13 +36,12 @@ public class PipelineService {
 
     public PipelineResponse runPipeline(Long id) {
         Pipeline pipeline = pipelineRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pipeline not found"));
+                .orElseThrow(() -> AppException.notFound("Pipeline not found"));
         pipeline.setStatus(PipelineStatus.RUNNING);
         pipeline.setStartedAt(LocalDateTime.now());
         pipelineRepository.save(pipeline);
 
         // TODO: Actual pipeline execution logic
-        // For now, simulate completion
         pipeline.setStatus(PipelineStatus.COMPLETED);
         pipeline.setCompletedAt(LocalDateTime.now());
         pipeline.setRecordsProcessed(0L);
