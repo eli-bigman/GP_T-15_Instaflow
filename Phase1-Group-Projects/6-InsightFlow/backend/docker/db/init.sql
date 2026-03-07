@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS sku_mappings (
     pos_sku         VARCHAR(20),                         
     ecom_sku        VARCHAR(20),                        
     notes           TEXT                                
-)
+);
 
 -- Store Reference
 -- For creating all 25 stores
