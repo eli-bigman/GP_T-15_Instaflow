@@ -1,55 +1,49 @@
 services:
-  postgres-app:
-    image: postgres:16-alpine
-    container_name: insightflow-app-db
+  db:
+    image: gdakore/insightflow-db:latest
+    container_name: insightflow-db
     environment:
+      POSTGRES_USER: ${APP_DB_USER}
+      POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
       POSTGRES_DB: insightflow_app
-      POSTGRES_USER: insightflow
-      POSTGRES_PASSWORD: insightflow_pass
     ports:
       - "5432:5432"
     volumes:
-      - pgdata-app:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U insightflow -d insightflow_app"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  postgres-warehouse:
-    image: postgres:16-alpine
-    container_name: insightflow-warehouse-db
-    environment:
-      POSTGRES_DB: insightflow_warehouse
-      POSTGRES_USER: insightflow_wh
-      POSTGRES_PASSWORD: insightflow_wh_pass
-    ports:
-      - "5433:5432"
-    volumes:
-      - pgdata-warehouse:/var/lib/postgresql/data
-      - ./data-engineering/warehouse/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
-    healthcheck:
-      test:
-        ["CMD-SHELL", "pg_isready -U insightflow_wh -d insightflow_warehouse"]
+      test: ["CMD-SHELL", "pg_isready -U ${APP_DB_USER} -d insightflow_app"]
       interval: 10s
       timeout: 5s
       retries: 5
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ${DOCKER_USERNAME:-gdakore}/insightflow-backend:latest
     container_name: insightflow-backend
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-app:5432/insightflow_app
-      SPRING_DATASOURCE_USERNAME: insightflow
-      SPRING_DATASOURCE_PASSWORD: insightflow_pass
+      APP_DB_URL: jdbc:postgresql://db:5432/insightflow_app
+      APP_DB_USER: ${APP_DB_USER}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+      APP_JWT_SECRET: ${APP_JWT_SECRET}
+      APP_ACCESS_TOKEN_EXPIRATION: ${APP_ACCESS_TOKEN_EXPIRATION}
+      APP_REFRESH_TOKEN_EXPIRATION: ${APP_REFRESH_TOKEN_EXPIRATION}
     depends_on:
-      postgres-app:
+      db:
         condition: service_healthy
 
+  frontend:
+    image: ${DOCKER_USERNAME:-gdakore}/insightflow-frontend:latest
+    container_name: insightflow-frontend
+    ports:
+      - "8501:8501"
+    environment:
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
+      COOKIE_NAME: ${FRONTEND_COOKIE_NAME}
+      COOKIE_KEY: ${FRONTEND_COOKIE_KEY}
+      COOKIE_EXPIRY_DAYS: ${FRONTEND_COOKIE_EXPIRY_DAYS}
+    depends_on:
+      - backend
+
 volumes:
-  pgdata-app:
-  pgdata-warehouse:
+  postgres_data:
