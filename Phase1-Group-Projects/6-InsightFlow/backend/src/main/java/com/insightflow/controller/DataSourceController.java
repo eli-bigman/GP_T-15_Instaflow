@@ -1,13 +1,13 @@
 package com.insightflow.controller;
 
 import com.insightflow.dto.*;
+import org.springframework.web.bind.annotation.*;
 import com.insightflow.model.User;
 import com.insightflow.service.DataSourceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController @RequestMapping("/api/datasources") @RequiredArgsConstructor
@@ -26,6 +26,4 @@ public class DataSourceController {
         return ResponseEntity.ok(dataSourceService.create(request, user));
     }
 
-    // TODO: Add file upload endpoint for CSV/JSON data sources
-    // TODO: Add test connection endpoint
 }
