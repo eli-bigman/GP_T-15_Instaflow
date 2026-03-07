@@ -1,11 +1,11 @@
 package com.insightflow.controller;
 
+import org.springframework.web.bind.annotation.*;
 import com.insightflow.dto.*;
 import com.insightflow.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController @RequestMapping("/api/auth") @RequiredArgsConstructor
 public class AuthController {

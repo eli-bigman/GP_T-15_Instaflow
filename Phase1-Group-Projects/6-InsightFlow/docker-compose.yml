@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - pgdata-app:/var/lib/postgresql/data
+      - pgdata-app:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U insightflow -d insightflow_app"]
       interval: 10s
@@ -29,7 +29,8 @@ services:
       - pgdata-warehouse:/var/lib/postgresql/data
       - ./data-engineering/warehouse/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U insightflow_wh -d insightflow_warehouse"]
+      test:
+        ["CMD-SHELL", "pg_isready -U insightflow_wh -d insightflow_warehouse"]
       interval: 10s
       timeout: 5s
       retries: 5

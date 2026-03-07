@@ -1,0 +1,31 @@
+# Cookie settings are overridden at runtime by COOKIE_NAME/COOKIE_KEY/COOKIE_EXPIRY_DAYS
+# environment variables (see .env). Values here are fallback defaults only.
+cookie:
+  expiry_days: 30
+  key: replace-with-env-COOKIE_KEY
+  name: insightflow_auth_cookie
+credentials:
+  usernames:
+    amali:
+      email: amalitech@gmail.com
+      failed_login_attempts: 0
+      first_name: Amali
+      last_name: Tech
+      logged_in: false
+      password: $2b$12$8.xl7j8FaEukj4Q3JU18heVk/3EpVlWRaW.LBak9sG4oCNuahovcG
+      roles:
+        - owner
+    team15:
+      email: team15@gmail.com
+      failed_login_attempts: 0
+      first_name: Human
+      last_name: Being
+      logged_in: false
+      password: $2b$12$zKwczcLlFmve4ho9UBDa1ecx.IjTNziS2CmSjTOpu49XR2ciq.X2i
+      roles:
+        - manager
+# OAuth2 secrets are loaded from .env (GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET)
+# Do NOT commit real credentials here.
+pre-authorized:
+  emails:
+    - amalitech@gmail.com

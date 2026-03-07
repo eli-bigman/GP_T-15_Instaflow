@@ -1,23 +1,23 @@
 package com.insightflow.service;
 
-// import com.insightflow.dto.FileUploadResponse;
-// import com.insightflow.model.DataSource;
-// import com.insightflow.model.IngestionJob;
-// import com.insightflow.model.enums.JobStatus;
-// import com.insightflow.model.enums.SourceType;
-// import com.insightflow.repository.DataSourceRepository;
-// import com.insightflow.repository.IngestionJobRepository;
-// import lombok.RequiredArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
-// import org.springframework.beans.factory.annotation.Value;
-// import org.springframework.stereotype.Service;
-// import org.springframework.web.multipart.MultipartFile;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import com.insightflow.dto.FileUploadResponse;
+import com.insightflow.model.DataSource;
+import com.insightflow.model.IngestionJob;
+import com.insightflow.model.enums.JobStatus;
+import com.insightflow.model.enums.SourceType;
+import com.insightflow.repository.DataSourceRepository;
+import com.insightflow.repository.IngestionJobRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-// import java.io.*;
-// import java.nio.charset.StandardCharsets;
-// import java.nio.file.*;
-// import java.time.LocalDateTime;
-// import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 /**
  * Service responsible for ingesting CSV file uploads.
@@ -57,25 +57,26 @@ public class FileIngestionService {
     //         headers = Arrays.asList(headerLine.split(","));
     //         log.info("Detected {} columns: {}", headers.size(), headers);
 
-    //         String line;
-    //         int rowNum = 1;
-    //         while ((line = reader.readLine()) != null) {
-    //             rowNum++;
-    //             totalRows++;
-    //             if (line.isBlank()) continue;
-    //             String[] values = line.split(",", -1);
-    //             Map<String, String> row = new LinkedHashMap<>();
-    //             for (int i = 0; i < headers.size(); i++) {
-    //                 String value = (i < values.length) ? values[i].trim() : "";
-    //                 row.put(headers.get(i).trim(), value);
-    //             }
-    //             List<String> requiredFields = List.of("transaction_id", "product_id", "quantity");
-    //             List<String> rowErrors = validationService.validateRow(row, requiredFields)
-    //                     .stream().map(vr -> "Row " + rowNum + ": " + vr.getErrorMessage()).toList();
-    //             if (!rowErrors.isEmpty()) { failedRows++; validationErrors.addAll(rowErrors); }
-    //             rows.add(row);
-    //         }
-    //     }
+        //     String line;
+        //     int rowNum = 1;
+        //     while ((line = reader.readLine()) != null) {
+        //         rowNum++;
+        //         totalRows++;
+        //         if (line.isBlank()) continue;
+        //         String[] values = line.split(",", -1);
+        //         Map<String, String> row = new LinkedHashMap<>();
+        //         for (int i = 0; i < headers.size(); i++) {
+        //             String value = (i < values.length) ? values[i].trim() : "";
+        //             row.put(headers.get(i).trim(), value);
+        //         }
+        //         List<String> requiredFields = List.of("transaction_id", "product_id", "quantity");
+        //         int finalRowNum = rowNum;
+        //         List<String> rowErrors = validationService.validateRow(row, requiredFields)
+        //                 .stream().map(vr -> "Row " + finalRowNum + ": " + vr.getErrorMessage()).toList();
+        //         if (!rowErrors.isEmpty()) { failedRows++; validationErrors.addAll(rowErrors); }
+        //         rows.add(row);
+        //     }
+        // }
 
     //     List<DataSource> csvSources = dataSourceRepository.findBySourceType(SourceType.CSV);
     //     DataSource dataSource;
