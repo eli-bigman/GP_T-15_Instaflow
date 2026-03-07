@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS data_sources (
     created_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+<<<<<<< Updated upstream
 -- Product Catalogue
 CREATE TABLE IF NOT EXISTS product_catalogue (
     product_id      BIGSERIAL       PRIMARY KEY,            -- e.g. PRD-A12. Universal key across all channels.
@@ -124,4 +125,3 @@ CREATE TABLE IF NOT EXISTS feedback_submissions (
     submitted_at        TIMESTAMP       NOT NULL,       
     ingested_at         TIMESTAMP       NOT NULL DEFAULT NOW()
 );
-
