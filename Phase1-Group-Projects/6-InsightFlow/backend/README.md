@@ -1,17 +1,17 @@
 # InsightFlow Backend
 
-A Spring Boot backend for InsightFlow — a data pipeline and insight reporting platform.
+A Spring Boot backend for InsightFlow — a multi-channel data pipeline and insight reporting platform for ShopSmart Ghana.
 
 ---
 
 ## Tech Stack
 
 - Java 25
-- Spring Boot 3.2.0
+- Spring Boot 4.0.3
 - PostgreSQL 16
 - Spring Security + JWT
-- Spring GraphQL
-- MapStruct
+- Spring RestClient (HTTP client for external API integration)
+- SpringDoc OpenAPI / Swagger UI
 - Lombok
 - Docker + Docker Compose
 - pgAdmin 4
@@ -143,19 +143,126 @@ http://localhost:8080/api-docs
 src/
 ├── main/
 │   ├── java/com/insightflow/
-│   │   ├── config/         # Security, JWT, filters
-│   │   ├── controller/     # REST controllers
-│   │   ├── model/          # JPA entities
-│   │   ├── repository/     # Spring Data repositories
-│   │   ├── service/        # Business logic
-│   │   └── dto/            # Data transfer objects
+│   │   ├── config/                     # Security (JWT filter, SecurityConfig)
+│   │   ├── controller/
+│   │   │   ├── AuthController          # POST /api/auth/**
+│   │   │   ├── DataSourceController    # CRUD for data source configurations
+│   │   │   ├── OrderFeedController     # Orders sync + push endpoints
+│   │   │   ├── FeedbackWebhookController  # Feedback sync + push endpoints
+│   │   │   └── ProductCatalogueController # Products sync + push endpoints
+│   │   ├── model/
+│   │   │   ├── enums/
+│   │   │   │   ├── OrderStatus         # PENDING | FULFILLED | CANCELLED | RETURNED
+│   │   │   │   ├── FeedbackCategory    # Delivery Speed | Product Quality | App Experience | Packaging | Overall
+│   │   │   │   ├── DataSourceType      # API | JSON | CSV | DATABASE
+│   │   │   │   └── SourceType          # API | JSON | CSV | DATABASE
+│   │   │   ├── Order                   # orders table — PII-masked before staging
+│   │   │   ├── OrderItem               # order_items table — cascaded from Order
+│   │   │   ├── FeedbackSubmission      # feedback_submissions table
+│   │   │   ├── ProductCatalogue        # product_catalogue table
+│   │   │   └── DataSource              # data_sources table — ingestion audit log
+│   │   ├── dto/
+│   │   │   ├── OrderDto                # Maps external API order JSON (order_items array)
+│   │   │   ├── OrderItemDto            # Maps nested order_items inside orders
+│   │   │   ├── FeedbackSubmissionDto   # Maps external API feedback JSON
+│   │   │   └── ProductCatalogueDto     # Maps external API product JSON
+│   │   ├── repository/
+│   │   │   ├── OrderRepository
+│   │   │   ├── OrderItemRepository
+│   │   │   ├── FeedbackSubmissionRepository
+│   │   │   ├── ProductCatalogueRepository
+│   │   │   └── DataSourceRepository
+│   │   ├── service/
+│   │   │   ├── ApiFeedService          # Orders ingestion pipeline (pull + push)
+│   │   │   ├── FeedbackIngestionService # Feedback ingestion pipeline (pull + push)
+│   │   │   ├── ProductCatalogueService # Product catalogue ingestion pipeline (pull + push)
+│   │   │   ├── StandardizationService  # DTO → entity mapping, validation, PII masking
+│   │   │   └── DataSourceService       # Data source CRUD + ingestion audit recording
+│   │   └── exception/                  # AppException, GlobalExceptionHandler
 │   └── resources/
-│       ├── application.properties
-│       
+│       └── application.properties
 docker/
 └── db/
     ├── Dockerfile          # Custom postgres image with schemas
     └── init.sql            # Database schema definitions
+```
+
+---
+
+## Online Channel Integration (E-Commerce API Connector)
+
+This module ingests orders, feedback, and product data from the ShopSmart external API into the staging PostgreSQL database.
+
+### Data Sources
+
+| Source | External Endpoint | Type | Schedule |
+|--------|------------------|------|----------|
+| Orders | `GET /api/orders` | API | Daily 01:00 UTC |
+| Order Items | Embedded in orders JSON | JSON | With orders |
+| Feedback | `GET /api/feedback` | API | Daily 01:05 UTC |
+| Products | `GET /api/products` | API | Daily 01:10 UTC |
+
+### Sync Endpoints (Pull)
+
+All sync endpoints are public (no JWT required) and can be triggered manually via Swagger.
+
+**Orders**
+```
+POST /api/v1/integration/orders/sync/all
+POST /api/v1/integration/orders/sync/date/{date}     # e.g. 2026-02-19
+POST /api/v1/integration/orders/sync/day/{day}       # e.g. tuesday
+```
+
+**Feedback**
+```
+POST /api/v1/ingestion/feedback/sync/all
+POST /api/v1/ingestion/feedback/sync/date/{date}
+POST /api/v1/ingestion/feedback/sync/day/{day}
+```
+
+**Products**
+```
+POST /api/v1/integration/products/sync/all
+POST /api/v1/integration/products/sync/date/{date}
+POST /api/v1/integration/products/sync/day/{day}
+```
+
+### Push Endpoints (Webhook)
+
+The external ShopSmart server sends real-time push notifications to these endpoints when new records are created.
+
+```
+POST /api/feed/orders            # Receives a single order JSON
+POST /api/v1/ingestion/feedback  # Receives a single feedback JSON
+POST /api/v1/ingestion/products  # Receives a single product JSON
+```
+
+### Pipeline Overview
+
+```
+External API
+    │
+    ▼
+fetchOrderList / fetchFeedbackList / fetchProductList
+    │   (flexible JSON parser — handles plain arrays and wrapped objects)
+    ▼
+Validation & Standardization
+    │   • Required field checks
+    │   • Region / payment method validation (orders)
+    │   • Rating range check 1–5 (feedback)
+    │   • Category normalization (feedback)
+    │   • Orphan check — feedback must reference a staged order
+    ▼
+Deduplication
+    │   existsByOrderId / existsByFeedbackId / existsBySku
+    ▼
+PII Masking (orders only)
+    │   SHA-256 hash on customer_id and delivery_address
+    ▼
+Persist to Staging DB
+    │   Order → cascades to OrderItems
+    ▼
+recordIngestion → data_sources table
 ```
 
 ---
@@ -239,6 +346,9 @@ docker-compose up -d db #OR docker compose up -d db
 **Port 5432 already in use**
 - You have a local PostgreSQL instance running alongside Docker
 - Stop it with: `sudo systemctl stop postgresql`
+
+**Feedback sync returns 0 saved / all orphans**
+- Run orders sync first (`POST /api/v1/integration/orders/sync/all`) — feedback requires parent orders to exist in the staging DB
 
 ---
 
