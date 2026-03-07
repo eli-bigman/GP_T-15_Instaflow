@@ -111,6 +111,24 @@ The app opens at **http://localhost:8501**.
 
 ---
 
+## Testing Before Push
+
+Run these checks locally before pushing to catch errors early:
+
+### Check for syntax errors
+
+```bash
+python -m py_compile app.py pages/*.py utils/*.py components/*.py
+```
+
+### Run linter
+
+```bash
+flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv,.venv,__pycache__,.git
+```
+
+---
+
 ## Authentication Flow
 
 ```
