@@ -1,7 +1,7 @@
 -- Seed admin user (password: password123)
 INSERT INTO users (id, email, name, password, role, created_at) VALUES
-  (1, 'admin@amalitech.com', 'Admin User', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN', NOW()),
-  (2, 'user@amalitech.com', 'Test User', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER', NOW())
+  (1, 'admin@amalitech.com', 'Admin User', '$2b$12$8.xl7j8FaEukj4Q3JU18heVk/3EpVlWRaW.LBak9sG4oCNuahovcG', 'ADMIN', NOW()),
+  (2, 'user@amalitech.com', 'Test User', '$2b$12$8.xl7j8FaEukj4Q3JU18heVk/3EpVlWRaW.LBak9sG4oCNuahovcG', 'USER', NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- Seed sample data sources
