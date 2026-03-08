@@ -68,10 +68,12 @@ with st.container():
             status = res['status']
             if status == "COMPLETED":
                 st.success("✅ All rows accepted! The data is now ready for reporting.") # SM-02
-            elif status == "PARTIAL_SUCCESS":
-                st.warning("⚠️ Partial Success: Some rows failed validation.") # SM-04
             else:
-                st.error("❌ Upload Failed: No data was ingested.") # SM-04
+                # SM-04: Notification clearly distinguishes partial failure from full failure
+                if res['recordsProcessed'] > 0:
+                    st.warning(f"⚠️ Partial Failure: {res['recordsFailed']} rows were rejected. {res['recordsProcessed']} rows were ingested.")
+                else:
+                    st.error("❌ Upload Failed: No data was ingested.")
 
             # Validation Errors Table
             if res.get('validationErrors'):

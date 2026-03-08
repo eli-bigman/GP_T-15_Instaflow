@@ -37,12 +37,12 @@ else:
     df['Status'] = df['status']
 
     # SM-13: Status indicators
-    def format_status(status):
-        if status == "COMPLETED": return "✅ Fully Accepted"
-        if status == "PARTIAL_SUCCESS": return "⚠️ Partially Accepted"
+    def format_status(row):
+        if row['Status'] == "COMPLETED": return "✅ Fully Accepted"
+        if row['Accepted'] > 0: return "⚠️ Partially Accepted"
         return "❌ Failed"
 
-    df['Status Display'] = df['Status'].apply(format_status)
+    df['Status Display'] = df.apply(format_status, axis=1)
 
     # Display Table
     st.subheader("Recent Uploads")
