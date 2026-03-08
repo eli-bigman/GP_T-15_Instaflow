@@ -38,6 +38,8 @@ public class SecurityConfig {
                         "/api/v1/integration/**",
                         "/api/v1/ingestion/**"
                 ).permitAll()
+                // Explicitly protect ingestion endpoints
+                .requestMatchers("/api/ingest/**").authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
