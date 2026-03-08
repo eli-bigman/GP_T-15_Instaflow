@@ -1,0 +1,26 @@
+# Airflow Auth (required for user management in Airflow 3.x)
+apache-airflow-providers-fab
+
+# Data Processing
+duckdb==1.0.0
+
+# Object Storage (MinIO/S3)
+boto3==1.38.0
+apache-airflow-providers-amazon==9.6.0
+
+# Data Quality
+soda-core==3.5.1
+soda-core-duckdb==3.5.1
+
+# Data Generation
+faker==37.1.0
+faker-commerce==1.0.2
+
+# Data Validation
+pydantic==2.11.4
+
+# Observability / Metrics
+prometheus-client==0.21.1
+
+# Utilities
+pyyaml==6.0.2
