@@ -8,4 +8,5 @@ import java.util.List;
 public interface DataSourceRepository extends JpaRepository<DataSource, Long> {
     List<DataSource> findAllByOrderByCreatedAtDesc();
     List<DataSource> findBySourceType(SourceType sourceType);
+    java.util.Optional<DataSource> findFirstByName(String name);
 }
