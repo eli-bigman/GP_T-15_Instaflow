@@ -31,6 +31,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**").permitAll()
+                // Inbound push endpoints from external server — public, no JWT
+                .requestMatchers("/api/feed/orders", "/api/v1/ingestion/feedback").permitAll()
+                // Sync/pull trigger endpoints — public for now (dev mode)
+                .requestMatchers(
+                        "/api/v1/integration/**",
+                        "/api/v1/ingestion/**"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
