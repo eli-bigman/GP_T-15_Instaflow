@@ -1,6 +1,7 @@
 # InsightFlow - Multi-Source Business Intelligence Pipeline
 
 ![CI/CD](https://github.com/eli-bigman/GP_T-15_Instaflow/actions/workflows/ci.yml/badge.svg)
+![CI/CD](https://github.com/eli-bigman/GP_T-15_Instaflow/actions/workflows/cd.yml/badge.svg)
 
 ## Overview
 
