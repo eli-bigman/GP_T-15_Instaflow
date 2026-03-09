@@ -11,7 +11,10 @@ import java.time.LocalDateTime;
 public class DataSource {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false) private String name;
+    
+    @Column(nullable = false, unique = true) 
+    private String name;
+
     private String description;
     @Enumerated(EnumType.STRING) @Column(nullable = false) private DataSourceType type;
     @Enumerated(EnumType.STRING) private SourceType sourceType;
